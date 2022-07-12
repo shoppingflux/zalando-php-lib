@@ -1,0 +1,40 @@
+{
+  "name": "shoppingflux/zalando-php-lib",
+  "description": "PHP Library for the Zalando API",
+  "keywords": [
+    "php", "library", "amazon", "zalando", "zfs", "api"
+  ],
+  "type": "library",
+  "license": "LGPL-3.0-or-later",
+  "homepage": "https://github.com/Blog-Ecommerce/amazon-mws-php-lib",
+  "authors": [{
+    "name": "Luis Da Costa",
+    "email": "luis.dacosta@shopping-feed.com",
+    "homepage": "https://shopping-feed.com"
+  }],
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=7.1.0",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "ext-simplexml": "*",
+    "ext-libxml": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.5"
+  },
+  "support": {
+    "issues": "https://github.com/shoppingflux/zalando-php-lib/issues",
+    "source": "https://github.com/shoppingflux/zalando-php-lib"
+  },
+  "autoload": {
+    "psr-4": {
+      "ShoppingFlux\\Zalando\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "ShoppingFlux\\Zalando\\Test\\": "test/"
+    }
+  }
+}
