@@ -178,7 +178,7 @@ class Client {
     }
 
     // Return headers separately from the Response Body
-    $response   = curl_exec($this->curlClient);
+    $response   = json_decode(curl_exec($this->curlClient));
     $headerSize = curl_getinfo($this->curlClient, CURLINFO_HEADER_SIZE);
     $httpCode   = curl_getinfo($this->curlClient, CURLINFO_HTTP_CODE);
 
@@ -186,7 +186,6 @@ class Client {
     curl_close($this->curlClient);
 
     // Return the response
-    var_dump($response);
     return $response;
   }
 
