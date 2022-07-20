@@ -50,11 +50,12 @@ class ShippingNotice {
 
   /**
    * @param $id
+   * @param array $params
    * @return mixed
    * @throws Exception
    */
-  public function update($id) {
-    return $this->client->put([self::BASE_SHIPPING_NOTICES, $id]);
+  public function update($id, array $params = []) {
+    return $this->client->put([self::BASE_SHIPPING_NOTICES, $id], [], $params);
   }
 
   /**

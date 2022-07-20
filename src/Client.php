@@ -7,6 +7,7 @@ use ShoppingFlux\Zalando\Resources\ZFS\ItemQuantities;
 use ShoppingFlux\Zalando\Resources\ZFS\ShippingNotice;
 use ShoppingFlux\Zalando\Resources\ZFS\StockLocations;
 use ShoppingFlux\Zalando\Resources\ZFS\StockMovements;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 /**
  * Class Client
@@ -136,6 +137,9 @@ class Client {
 
     // Close the connection
     curl_close($this->curlClient);
+
+    // Throw error if "429 - Too Many Requests"
+    if ($httpCode == 429) throw new TooManyRequestsHttpException;
 
     // Store the accessToken
     $this->accessToken = $response->access_token;
