@@ -62,6 +62,11 @@ class Client {
   private $accessToken;
 
   /**
+   * @var string $etag
+   */
+  private $etag;
+
+  /**
    * @var bool $sandbox
    */
   private $isSandbox;
@@ -103,6 +108,20 @@ class Client {
    */
   public function getMerchantID(): string {
     return $this->merchantID;
+  }
+
+  /**
+   * @return string
+   */
+  public function getAccessToken(): string {
+    return $this->accessToken;
+  }
+
+  /**
+   * @return string
+   */
+  public function getETag(): string {
+    return $this->etag;
   }
 
   /**
@@ -160,20 +179,27 @@ class Client {
     $this->curlClient = curl_init();
 
     // Add query params
-    $path = implode('/', $path);
+    $reqPath = implode('/', $path);
     if (!empty($query)) {
       $path .= '?' . http_build_query($query);
     }
 
+    // Headers
+    $headers = [
+      'Content-Type: application/json',
+      'Authorization: Bearer ' . $this->accessToken
+    ];
+
+    // Append etag
+    if ($this->etag) $headers[] = 'If-Match: ' . $this->etag;
+
     // Set the request params
-    curl_setopt($this->curlClient, CURLOPT_URL, $this->baseUrl . '/' . $path);
+    curl_setopt($this->curlClient, CURLOPT_URL, $this->baseUrl . '/' . $reqPath);
     curl_setopt($this->curlClient, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($this->curlClient, CURLOPT_HEADER, false);
+    curl_setopt($this->curlClient, CURLOPT_HEADER, true);
     curl_setopt($this->curlClient, CURLOPT_NOBODY, false);
     curl_setopt($this->curlClient, CURLOPT_CUSTOMREQUEST, $method);
-    curl_setopt($this->curlClient, CURLOPT_HTTPHEADER, [
-      'Authorization: Bearer ' . $this->accessToken
-    ]);
+    curl_setopt($this->curlClient, CURLOPT_HTTPHEADER, $headers);
 
     // Add params if any
     if (!empty($params)) {
@@ -182,9 +208,20 @@ class Client {
     }
 
     // Return headers separately from the Response Body
-    $response   = json_decode(curl_exec($this->curlClient));
+    $body       = curl_exec($this->curlClient);
     $headerSize = curl_getinfo($this->curlClient, CURLINFO_HEADER_SIZE);
     $httpCode   = curl_getinfo($this->curlClient, CURLINFO_HTTP_CODE);
+    $header     = $this->headerToArray(substr($body, 0, $headerSize));
+    $response   = json_decode(substr($body, $headerSize));
+
+    // If there's a token and an unhauthorized error is given, we refresh the token and try again
+    if ($httpCode == 401 && $this->accessToken) {
+      $this->refreshToken();
+      return $this->request($method, $path, $query, $params);
+    }
+    
+    // Store the etag if retrieved in the headers
+    if (isset($header['etag'])) $this->etag = $header['etag'];
 
     // Close the connection
     curl_close($this->curlClient);
@@ -253,5 +290,22 @@ class Client {
    */
   private function wrap($value): array {
     return !is_array($value) ? [$value] : $value;
+  }
+
+  /**
+   * Convert the header into an array
+   * @see https://stackoverflow.com/a/44698478
+   * @param $header
+   * @return array
+   */
+  private function headerToArray($header): array {
+    foreach(explode("\r\n", $header) as $row) {
+      if (preg_match('/(.*?): (.*)/', $row, $matches)) {
+        $headers[$matches[1]] = $matches[2];
+      }
+    }
+
+    // Return the header as an array
+    return $headers;
   }
 }

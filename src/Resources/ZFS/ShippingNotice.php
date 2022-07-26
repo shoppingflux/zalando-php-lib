@@ -72,8 +72,8 @@ class ShippingNotice {
    * @return mixed
    * @throws Exception
    */
-  public function createAnnouncedItemSets($id) {
-    return $this->client->post([sprintf(self::BASE_ANNOUNCED_ITEM_SETS, $id)]);
+  public function createAnnouncedItemSets($id, array $params = []) {
+    return $this->client->post([sprintf(self::BASE_ANNOUNCED_ITEM_SETS, $id)], [], $params);
   }
 
   /**
@@ -92,7 +92,7 @@ class ShippingNotice {
    * @throws Exception
    */
   public function createAnnouncementConfirmations($id) {
-    return $this->client->get([sprintf(self::BASE_ANNOUNCEMENT_CONFIRMATIONS, $id)]);
+    return $this->client->post([sprintf(self::BASE_ANNOUNCEMENT_CONFIRMATIONS, $id)]);
   }
 
   /**
@@ -109,8 +109,8 @@ class ShippingNotice {
    * @return mixed
    * @throws Exception
    */
-  public function createDispatchItemSets($id) {
-    return $this->client->post([sprintf(self::BASE_DISPATCH_ITEM_SETS, $id)]);
+  public function createDispatchItemSets($id, array $params = []) {
+    return $this->client->post([sprintf(self::BASE_DISPATCH_ITEM_SETS, $id)], [], $params);
   }
 
   /**
